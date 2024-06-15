@@ -1,28 +1,30 @@
-// Load environment variables from .env file
-require('dotenv').config();
-const OPENAI_API_KEY= process.env.OPENAI_API_KEY
-console.log(OPENAI_API_KEY);
-// Import the OpenAI package
-const OpenAI = require('openai');
+const Bot = require('./Bot.js');
 
-// Initialize OpenAI with the API key from environment variables
-const openai = new OpenAI({
-    apiKey: OPENAI_API_KEY,
-});
-
-// Async function to call the OpenAI API
 async function main() {
     try {
-        const chatCompletion = await openai.chat.completions.create({
-            messages: [{ role: 'user', content: 'Say this is a test' }],
-            model: 'gpt-3.5-turbo',
-        });
+        const bot = new Bot();
+        await bot.initSync();
 
-        console.log(chatCompletion);
+        // const thread = await bot.createThread();
+        // console.log('Created thread:', thread);
+        const thread = await bot.retrieveThread('thread_T4e3FqCxs0KCfcadzYGUZHjb');
+        console.log('Retrieved thread:', thread);
+        const message = 'Hello, which laptop should I choose?';
+        const response = await bot.addMessageToThread(thread.id, message);
+        console.log('Added message to thread:', response);
+        // const messageList = await bot.listMessagesInThread(thread.id);
+        // console.log(messageList);
+        const res = await bot.getAnswer(thread.id);
+        // console.log('Ran thread:', res);
+        for (const message of res.data) {
+            if (message.role === 'assistant')
+                console.log(`Assistant: ${message.content[0].text.value}`);
+            else
+                console.log(`User: ${message.content[0].text.value}`);
+        }
     } catch (error) {
-        console.error('Error calling OpenAI API:', error);
+        console.error('Error:', error);
     }
 }
 
-// Call the main function
 main();
