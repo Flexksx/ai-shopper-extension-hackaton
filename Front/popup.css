@@ -1,40 +1,76 @@
 body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    width: 300px;
-    height: 500px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #e0ffff; /* Change background color to light sky blue */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  h1 {
-    font-size: 24px;
-  }
-  .link {
-    margin: 15px 0;
-  }
-  .chat {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .chat input[type="text"] {
-    width: calc(100% - 70px);
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  .chat button {
-    padding: 10px 15px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    cursor: pointer;
-  }
-  .chat button:hover {
-    background-color: #e0e0e0;
-  }
-  
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  width: 300px;
+  height: 500px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #e0ffff; /* Change background color to light sky blue */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.navbar {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.navbar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar ul li {
+  display: inline;
+  margin: 0 10px;
+}
+
+.navbar ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.navbar ul li a:hover {
+  background-color: #555;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+.link {
+  margin: 15px 0;
+}
+
+.chat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat input[type="text"] {
+  width: calc(100% - 70px);
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.chat button {
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.chat button:hover {
+  background-color: #e0e0e0;
+}
