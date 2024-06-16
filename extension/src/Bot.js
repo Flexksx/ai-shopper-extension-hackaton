@@ -108,6 +108,9 @@ class Bot {
         return run;
     }
 
+    async loadContentToVectorStore(content) {
+        
+    }
 }
 
 module.exports = Bot;
