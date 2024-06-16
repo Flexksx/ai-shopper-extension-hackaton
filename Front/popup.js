@@ -1,3 +1,6 @@
+var thread_id='thread_Hf0DWaTaqehvtJJEl21S47Xb'
+
+
 document.addEventListener('DOMContentLoaded', function () {
   initializePopup();
 
@@ -21,39 +24,36 @@ document.addEventListener('DOMContentLoaded', function () {
       saveChatMessage(chatInput); // Save the chat message
       console.log('Chat message:', chatInput);
       document.getElementById('chat-input').value = ''; // Clear the input field
-      sendMessageToServer(chatInput); // Send the message to the server
-      runThread();
+      sendMessageToServer(chatInput,thread_id); // Send the message to the server
+      runThread(thread_id);
     }
   });
 });
-
-function runThread() {
+function runThread(thread_id) {
   let serverIp = "http://localhost:3000";
   let endpoint = "/thread";
-  let thread_id = "thread_T4e3FqCxs0KCfcadzYGUZHjb";
 
   fetch(`${serverIp}${endpoint}/${thread_id}/run`, {
-    method: "POST"
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
     }
-    return response.json();
   })
-  .then(data => {
-    console.log('Response data:', data);
-  })
-  .catch(error => {
-    console.error('Fetch error:', error);
-  });
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+
+
 
 }
 
-function sendMessageToServer(message) {
+function sendMessageToServer(message,thread_id) {
   let serverIp = "http://localhost:3000";
   let endpoint = "/thread";
-  let thread_id = "thread_T4e3FqCxs0KCfcadzYGUZHjb";
   let requestBody = { "message": message };
 
   fetch(`${serverIp}${endpoint}/${thread_id}/message`, {
@@ -63,18 +63,18 @@ function sendMessageToServer(message) {
       "Content-Type": "application/json"
     }
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Response data:', data);
-  })
-  .catch(error => {
-    console.error('Fetch error:', error);
-  });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Response data:', data);
+    })
+    .catch(error => {
+      console.error('Fetch error:', error);
+    });
 
 }
 
@@ -106,10 +106,9 @@ function initializePopup() {
   });
 }
 
-function sendTabUrlToServer(currentTabUrl) {
+function sendTabUrlToServer(currentTabUrl,thread_id) {
   let serverIp = "http://localhost:3000";
   let endpoint = "/source";
-  let thread_id = "thread_T4e3FqCxs0KCfcadzYGUZHjb";
   let requestBody = { "source_url": currentTabUrl };
 
   fetch(`${serverIp}${endpoint}/${thread_id}`, {
@@ -119,18 +118,18 @@ function sendTabUrlToServer(currentTabUrl) {
       "Content-Type": "application/json"
     }
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Response data:', data);
-  })
-  .catch(error => {
-    console.error('Fetch error:', error);
-  });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Response data:', data);
+    })
+    .catch(error => {
+      console.error('Fetch error:', error);
+    });
 
 }
 
@@ -150,26 +149,25 @@ function saveChatMessage(message) {
   chatZone.scrollTop = chatZone.scrollHeight; // Scroll to the bottom
 }
 
-function retrieveThreadMessages() {
+function retrieveThreadMessages(thread_id) {
   let serverIp = "http://localhost:3000";
   let endpoint = "/thread";
-  let thread_id = "thread_T4e3FqCxs0KCfcadzYGUZHjb";
 
   fetch(`${serverIp}${endpoint}/${thread_id}/messages`, {
     method: "GET"
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Response data:', data);
-  })
-  .catch(error => {
-    console.error('Fetch error:', error);
-  });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Response data:', data);
+    })
+    .catch(error => {
+      console.error('Fetch error:', error);
+    });
 
 }
 

@@ -1,7 +1,9 @@
+const fs = require('fs');
 const url = "http://localhost:3000";
 const endpoint = "/getreddit";
+const query = "Birds of Paradise Palette review";
 const requestBody = {
-    "searchQuery": "Asus ROG Strix G15 Ryzen 7 4800H RTX3060 review"
+    "searchQuery": query
 };
 
 fetch(url + endpoint,{
@@ -13,7 +15,8 @@ fetch(url + endpoint,{
 })
 .then(response => response.json())
 .then(data => {
-    console.log(data);
+    // console.log(data);
+    fs.writeFileSync(`${query.split(' ').join('')}.json`, JSON.stringify(data, null, 2));
 })
 .catch(error => {
     console.error('Error:', error);
