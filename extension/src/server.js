@@ -159,8 +159,18 @@ app.post('/thread/:id/run', async (req, res) => {
 app.get('/thread/:id/messages', async (req, res) => {
     console.log('Listing messages in thread:', req.params.id);
     try {
+        let messagesList=[]
         const messages = await bot.listMessagesInThread(req.params.id);
-        res.status(200).send(messages);
+        console.log(messages.body.data[0].content[0]);
+        for (let i = 0; i < messages.body.data.length; i++) {
+            let messageRole = messages.body.data[i].role;
+            let messageContent =""
+            if (messages.body.data[i].content[0].type=='text'){
+                messageContent = messages.body.data[i].content[0].text.value;
+            }
+            messagesList.push({"role": messageRole, "content": messageContent});
+        }
+        res.status(200).send(messagesList);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
