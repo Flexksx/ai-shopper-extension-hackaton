@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const app = express();
 const port = 3000;
 const bot = new Bot();
-
+var websitesAlreadyAdded = [];
 dotenv.config();
 console.log(dotenv.config());
 
@@ -334,6 +334,9 @@ app.get('/thread/:id/messages', async (req, res) => {
             let messageContent = ""
             if (messages.body.data[i].content[0].type == 'text') {
                 messageContent = messages.body.data[i].content[0].text.value;
+                if (messageContent[0] === "[") {
+                    continue;
+                }
             }
             messagesList.push({ "role": messageRole, "content": messageContent });
         }
@@ -351,9 +354,15 @@ app.post('/thread/:id/addwebsite', async (req, res) => {
     console.log('Adding website:', req.body.url);
     try {
         const { url } = req.body;
+        if (websitesAlreadyAdded.includes(url)) {
+            console.log(websitesAlreadyAdded);
+            console.log("Site already added");
+            return res.status(200).send({ message: 'Site already added' });
+        }
         let allText = await scrapeCatalog(url);
         allText = JSON.stringify(allText);
         const response = await bot.addMessageToThread(req.params.id, allText);
+        websitesAlreadyAdded.push(url);
         res.status(200).send(response);
         console.log("Site added");
     }
