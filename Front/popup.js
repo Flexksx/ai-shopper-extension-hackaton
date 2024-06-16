@@ -149,3 +149,27 @@ function saveChatMessage(message) {
   chatZone.appendChild(chatMessage);
   chatZone.scrollTop = chatZone.scrollHeight; // Scroll to the bottom
 }
+
+function retrieveThreadMessages() {
+  let serverIp = "http://localhost:3000";
+  let endpoint = "/thread";
+  let thread_id = "thread_T4e3FqCxs0KCfcadzYGUZHjb";
+
+  fetch(`${serverIp}${endpoint}/${thread_id}/messages`, {
+    method: "GET"
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Response data:', data);
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+  });
+
+}
+
