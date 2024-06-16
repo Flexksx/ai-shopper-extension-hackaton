@@ -83,6 +83,12 @@ class Bot {
         return messagesList
     }
 
+    async runThread(threadId) {
+        const run = await this.#createRun(threadId);
+        const completedRun = await this.#waitForRunCompletion(threadId,run.id);
+        return completedRun;
+    }
+
     async #createRun(threadId) {
         const run = await this.openaiClient.beta.threads.runs.create(
             threadId,
