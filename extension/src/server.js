@@ -334,7 +334,7 @@ app.get('/thread/:id/messages', async (req, res) => {
             let messageContent = ""
             if (messages.body.data[i].content[0].type == 'text') {
                 messageContent = messages.body.data[i].content[0].text.value;
-                if (messageContent[0] === "[") {
+                if (messageContent[0] === "[" || messageContent[0]==="{") {
                     continue;
                 }
             }
