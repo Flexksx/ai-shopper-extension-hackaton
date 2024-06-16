@@ -12,89 +12,89 @@ console.log(dotenv.config());
 
 // Function to get Reddit comments
 async function getRedditComments(searchQuery) {
-  const auth = {
-    username: process.env.CLIENT_ID,
-    password: process.env.SECRET_KEY
-  };
-  console.log(auth);
+    const auth = {
+        username: process.env.CLIENT_ID,
+        password: process.env.SECRET_KEY
+    };
+    console.log(auth);
 
-  const data = {
-    grant_type: 'password',
-    username: process.env.USERNAME,
-    password: process.env.PASSWORD
-  };
-
-  const headers = {
-    'User-Agent': 'MyApi/0.0.1'
-  };
-
-  try {
-    // Get access token
-    const tokenResponse = await axios.post('https://www.reddit.com/api/v1/access_token', new URLSearchParams(data), {
-      auth: auth,
-      headers: {
-        ...headers,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    });
-    const accessToken = tokenResponse.data.access_token;
-
-    // Update headers with access token
-    const authHeaders = {
-      ...headers,
-      'Authorization': `bearer ${accessToken}`
+    const data = {
+        grant_type: 'password',
+        username: process.env.USERNAME,
+        password: process.env.PASSWORD
     };
 
-    // Search for posts
-    const searchUrl = `https://oauth.reddit.com/search/?q=${encodeURIComponent(searchQuery)}&type=link`;
-    const searchRes = await axios.get(searchUrl, { headers: authHeaders });
-    const posts = searchRes.data.data.children;
+    const headers = {
+        'User-Agent': 'MyApi/0.0.1'
+    };
 
-    if (posts.length === 0) {
-      console.log("No posts found.");
-      return;
+    try {
+        // Get access token
+        const tokenResponse = await axios.post('https://www.reddit.com/api/v1/access_token', new URLSearchParams(data), {
+            auth: auth,
+            headers: {
+                ...headers,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        const accessToken = tokenResponse.data.access_token;
+
+        // Update headers with access token
+        const authHeaders = {
+            ...headers,
+            'Authorization': `bearer ${accessToken}`
+        };
+
+        // Search for posts
+        const searchUrl = `https://oauth.reddit.com/search/?q=${encodeURIComponent(searchQuery)}&type=link`;
+        const searchRes = await axios.get(searchUrl, { headers: authHeaders });
+        const posts = searchRes.data.data.children;
+
+        if (posts.length === 0) {
+            console.log("No posts found.");
+            return;
+        }
+
+        const firstPostTitle = posts[0].data.title;
+        const firstPostId = posts[0].data.id;
+
+        // Get comments
+        const commentsUrl = `https://oauth.reddit.com/comments/${firstPostId}.json`;
+        const commentsRes = await axios.get(commentsUrl, { headers: authHeaders });
+
+        if (commentsRes.status !== 200) {
+            console.log(`Failed to retrieve comments: ${commentsRes.status}`);
+            return;
+        }
+
+        const commentsData = commentsRes.data;
+        const comments = commentsData[1].data.children;
+        let commentsList = retrieveCommentsList(comments)
+        // console.log(`Title: ${firstPostTitle}`);
+        // console.log("=".repeat(40));
+
+        // Print comments
+        // printComments(comments);
+        return commentsList
+    } catch (error) {
+        console.error('Error:', error.response ? error.response.data : error.message);
     }
-
-    const firstPostTitle = posts[0].data.title;
-    const firstPostId = posts[0].data.id;
-
-    // Get comments
-    const commentsUrl = `https://oauth.reddit.com/comments/${firstPostId}.json`;
-    const commentsRes = await axios.get(commentsUrl, { headers: authHeaders });
-
-    if (commentsRes.status !== 200) {
-      console.log(`Failed to retrieve comments: ${commentsRes.status}`);
-      return;
-    }
-
-    const commentsData = commentsRes.data;
-    const comments = commentsData[1].data.children;
-
-    console.log(`Title: ${firstPostTitle}`);
-    console.log("=".repeat(40));
-
-    // Print comments
-    // printComments(comments);
-    return comments;
-  } catch (error) {
-    console.error('Error:', error.response ? error.response.data : error.message);
-  }
 }
 
-function printComments(comments, level = 0) {
-  for (const comment of comments.slice(0, 15)) {
-    if (comment.data.body) {
-      const author = comment.data.author;
-      const body = comment.data.body;
-      console.log(`${' '.repeat(level * 2)}Author: ${author}`);
-      console.log(`${' '.repeat(level * 2)}Comment: ${body}`);
-      console.log(`${'-'.repeat(40)}`);
-      if (comment.data.replies) {
-        const subcomments = comment.data.replies.data.children;
-        printComments(subcomments, level + 1);
-      }
+function retrieveCommentsList(comments, level = 0) {
+    let commentsList = []
+    for (const comment of comments) {
+        if (comment.data.body) {
+            const author = comment.data.author;
+            const body = comment.data.body;
+            commentsList.push(body)
+            if (comment.data.replies) {
+                const subcomments = comment.data.replies.data.children;
+                retrieveCommentsList(subcomments, level + 1);
+            }
+        }
     }
-  }
+    return commentsList
 }
 
 
@@ -144,7 +144,7 @@ function isSingleProductPage($, url) {
     } else if (url.includes('xstore.md')) {
         return $('.h2').length > 0 && !$('.category-prods .row > .col-sm-6').length;
     }
-    
+
     return false;
 }
 
@@ -212,7 +212,7 @@ function scrapeMakeupProducts($, url) {
         const relativeLink = $(element).find('.simple-slider-list__name').attr('href');
         const link = baseUrl + relativeLink; // Concatenate base URL with relative URL
         const description = $(element).find('.simple-slider-list__description').text().trim();
-        
+
         let price = $(element).find('.simple-slider-list__price .price_item').text().trim();
         if (!price) {
             price = $(element).find('.simple-slider-list__price_old .price_item').text().trim();
@@ -271,11 +271,11 @@ function scrapeXstoreProducts($) {
 
 
 // Initialize bot
-    try {
-        bot.initSync();
-    } catch (error) {
-        console.log('Error:', error.message);
-    }
+try {
+    bot.initSync();
+} catch (error) {
+    console.log('Error:', error.message);
+}
 
 // Retrieve thread
 app.get('/thread/:id', async (req, res) => {
@@ -316,7 +316,7 @@ app.post('/thread/:id/run', async (req, res) => {
         console.log('Running thread:', req.params.id);
         const response = await bot.runThread(req.params.id);
         res.status(200).send(response);
-        console.log("Thread run");
+        console.log("Thread ran successfully");
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
@@ -326,16 +326,16 @@ app.post('/thread/:id/run', async (req, res) => {
 app.get('/thread/:id/messages', async (req, res) => {
     console.log('Listing messages in thread:', req.params.id);
     try {
-        let messagesList=[]
+        let messagesList = []
         const messages = await bot.listMessagesInThread(req.params.id);
         // console.log(messages.body.data[0].content[0]);
         for (let i = 0; i < messages.body.data.length; i++) {
             let messageRole = messages.body.data[i].role;
-            let messageContent =""
-            if (messages.body.data[i].content[0].type=='text'){
+            let messageContent = ""
+            if (messages.body.data[i].content[0].type == 'text') {
                 messageContent = messages.body.data[i].content[0].text.value;
             }
-            messagesList.push({"role": messageRole, "content": messageContent});
+            messagesList.push({ "role": messageRole, "content": messageContent });
         }
         res.status(200).send(messagesList);
     } catch (error) {
@@ -349,26 +349,27 @@ app.listen(port, () => {
 
 app.post('/thread/:id/addwebsite', async (req, res) => {
     console.log('Adding website:', req.body.url);
-    try{
-        const {url} = req.body;
+    try {
+        const { url } = req.body;
         let allText = await scrapeCatalog(url);
-        allText=JSON.stringify(allText);
+        allText = JSON.stringify(allText);
         const response = await bot.addMessageToThread(req.params.id, allText);
         res.status(200).send(response);
         console.log("Site added");
     }
-    catch(error){
+    catch (error) {
         res.status(500).send({ error: error.message });
     }
 });
 
 app.post('/getreddit', async (req, res) => {
     console.log('Getting reddit:', req.body.searchQuery);
-    try{
-        const {searchQuery} = req.body;
+    try {
+        const { searchQuery } = req.body;
         let comments = await getRedditComments(searchQuery);
         res.status(200).send(comments);
-    }catch(error){
+
+    } catch (error) {
         res.status(500).send({ error: error.message });
     }
 });

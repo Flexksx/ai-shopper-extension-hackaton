@@ -65,13 +65,13 @@ async function getRedditComments(searchQuery) {
 
     const commentsData = commentsRes.data;
     const comments = commentsData[1].data.children;
-
-    console.log(`Title: ${firstPostTitle}`);
-    console.log("=".repeat(40));
+    let commentsList = retrieveCommentsList(comments)
+    // console.log(`Title: ${firstPostTitle}`);
+    // console.log("=".repeat(40));
 
     // Print comments
-    printComments(comments);
-
+    // printComments(comments);
+    return commentsList
   } catch (error) {
     console.error('Error:', error.response ? error.response.data : error.message);
   }
@@ -91,6 +91,22 @@ function printComments(comments, level = 0) {
       }
     }
   }
+}
+
+function retrieveCommentsList(comments,level=0){
+  let commentsList = []
+  for (const comment of comments.slice(0, 15)) {
+    if (comment.data.body) {
+      const author = comment.data.author;
+      const body = comment.data.body;
+      commentsList.push(body)
+      if (comment.data.replies) {
+        const subcomments = comment.data.replies.data.children;
+        retrieveCommentsList(subcomments, level + 1);
+      }
+    }
+  }
+  return commentsList
 }
 
 // Run the function with the search query

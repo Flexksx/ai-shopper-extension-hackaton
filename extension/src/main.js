@@ -7,7 +7,8 @@ async function main() {
 
         // const thread = await bot.createThread();
         // console.log('Created thread:', thread);
-        const thread = await bot.retrieveThread('thread_T4e3FqCxs0KCfcadzYGUZHjb');
+        const thread = await bot.createThread();
+        console.log('Created thread:', thread);
         console.log('Retrieved thread:', thread);
         const message = 'Hello, which laptop should I choose?';
         const response = await bot.addMessageToThread(thread.id, message);
