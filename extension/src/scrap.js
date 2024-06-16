@@ -1,15 +1,50 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-async function scrapeProductData(url) {
+async function scrapeCatalog(url) {
     try {
-        // Fetch the webpage content
         const response = await axios.get(url);
         const html = response.data;
-
-        // Load HTML into cheerio
         const $ = cheerio.load(html);
 
+        // Check if the URL has a product in href, indicating it's a single product page
+        if (url.includes('product') || isSingleProductPage($, url)) {
+            return await scrapeProductData($, url);
+        } else {
+            // Determine which scraper to use based on the URL
+            if (url.includes('makeup.md') || url.includes('makeup.ro')) {
+                return scrapeMakeupProducts($, url);
+            } else if (url.includes('xstore.md')) {
+                return scrapeXstoreProducts($);
+            } else {
+                throw new Error('Unsupported website.');
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching or processing data:', error);
+        return null;
+    }
+}
+
+
+function isSingleProductPage($, url) {
+    // Check if the URL has 'product' in it, indicating a single product page
+    if (url.includes('product')) {
+        return true;
+    }
+
+    // Further checks based on content selectors
+    if (url.includes('makeup.md') || url.includes('makeup.ro')) {
+        return $('.product-item__name').length > 0;
+    } else if (url.includes('xstore.md')) {
+        return $('.h2').length > 0 && !$('.category-prods .row > .col-sm-6').length;
+    }
+    
+    return false;
+}
+
+async function scrapeProductData($, url) {
+    try {
         // Determine which site we are scraping
         const domain = new URL(url).hostname;
 
@@ -63,39 +98,77 @@ async function scrapeProductData(url) {
     }
 }
 
+function scrapeMakeupProducts($, url) {
+    const products = [];
+    const baseUrl = 'https://makeup.ro';
 
-async function scrapeCatalogText(url) {
-    try {
-        // Fetch the webpage content
-        const response = await axios.get(url);
-        const html = response.data;
-
-        // Load HTML into cheerio
-        const $ = cheerio.load(html);
-
-        // Find the catalog div and extract its text content, excluding scripts and images
-        const $catalogDiv = $('.catalog');
+    $('div.catalog-products ul.simple-slider-list > li').each((index, element) => {
+        const title = $(element).find('.simple-slider-list__name').text().trim();
+        const relativeLink = $(element).find('.simple-slider-list__name').attr('href');
+        const link = baseUrl + relativeLink; // Concatenate base URL with relative URL
+        const description = $(element).find('.simple-slider-list__description').text().trim();
         
-        // Remove script and image tags from inside the catalog div
-        $catalogDiv.find('script, img').remove();
+        let price = $(element).find('.simple-slider-list__price .price_item').text().trim();
+        if (!price) {
+            price = $(element).find('.simple-slider-list__price_old .price_item').text().trim();
+        }
+        if (price) {
+            price += ' ' + $(element).find('.simple-slider-list__price .currency').text().trim();
+        }
 
-        // Extract plain text content from the catalog div
-        const catalogText = $catalogDiv.text().trim();
+        const reviewCount = $(element).find('.simple-slider-list__reviews-count').text().trim() || '0';
+        const activeStars = $(element).find('.star-list__item:not(.star-list__item-gray)').length;
 
-        return catalogText;
-    } catch (error) {
-        console.error('Error fetching or processing data:', error);
-        return null;
-    }
+        const product = {
+            title,
+            link,
+            price: price || 'N/A',
+            description,
+            reviewCount,
+            activeStars
+        };
+
+        products.push(product);
+    });
+
+    return products;
 }
 
-// const xstoreUrl = 'https://makeup.md/product/620186/';
-// const makeupUrl = 'https://makeup.md/ru/product/620186/';
-// const xstoreUrl = 'https://makeup.md/categorys/3/';
-// scrapeProductData(xstoreUrl).then(productData => {
-//     console.log('Product Data:', productData);
-// });
+function scrapeXstoreProducts($) {
+    const products = [];
 
-// scrapeCatalogText(xstoreUrl).then(allText => {
-//     console.log('All Text Content:', allText);
+    $('.category-prods .row > .col-sm-6').each((index, element) => {
+        const title = $(element).find('.xp-title').text().trim();
+        const link = $(element).find('.xp-title').attr('href');
+        const price = $(element).find('.xprice').text().trim();
+        const description = $(element).find('.xp-attr').text().trim();
+
+        const categories = [];
+        $(element).find('.xp-categ a').each((i, el) => {
+            categories.push($(el).text().trim());
+        });
+        const category = categories.join(' / ');
+
+        const product = {
+            title,
+            link,
+            price,
+            description,
+            category
+        };
+
+        products.push(product);
+    });
+
+    return products;
+}
+
+//const link = 'https://makeup.ro/categorys/37541/'; // Replace with the actual URL
+//const link = 'https://makeup.md/ru/product/600089/';
+
+//const link = 'https://xstore.md/ru/search?search=asus+rog+strix'; 
+//const link = 'https://xstore.md/ru/noutbuki/igrovye/asus-rog-strix-g16-g614jz-16-i7-13650hx-16gb-ram-1tb-ssd-rtx4080';
+
+// scrapeCatalog(link).then(products => {
+//     console.log('Products:', products);
 // });
