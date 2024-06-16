@@ -1,5 +1,7 @@
 const express = require('express');
 const Bot = require('./Bot');
+const cors = require('cors');
+
 // const {scrapeProductData} = require('./scrap');
 const app = express();
 const port = 3000;
@@ -7,6 +9,7 @@ const bot = new Bot();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 const axios = require('axios');
 const cheerio = require('cheerio');
@@ -125,6 +128,7 @@ app.post('/thread/:id/message', async (req, res) => {
         const { message } = req.body;
         const response = await bot.addMessageToThread(req.params.id, message);
         res.status(200).send(response);
+        console.log("Message added");
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
@@ -145,6 +149,7 @@ app.post('/thread/:id/run', async (req, res) => {
     try {
         const response = await bot.runThread(req.params.id);
         res.status(200).send(response);
+        console.log("Thread run");
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
@@ -173,6 +178,7 @@ app.post('/thread/:id/addwebsite', async (req, res) => {
         allText=JSON.stringify(allText);
         const response = await bot.addMessageToThread(req.params.id, allText);
         res.status(200).send(response);
+        console.log("Site added");
     }
     catch(error){
         res.status(500).send({ error: error.message });
