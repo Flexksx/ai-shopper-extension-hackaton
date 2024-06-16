@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('send-btn').addEventListener('click', function () {
     let chatInput = document.getElementById('chat-input').value.trim();
     if (chatInput) {
+      addChatMessage(chatInput, 'user'); // Display the user message
       saveChatMessage(chatInput); // Save the chat message
       console.log('Chat message:', chatInput);
       document.getElementById('chat-input').value = ''; // Clear the input field
@@ -71,13 +72,13 @@ function sendMessageToServer(message) {
   })
   .then(data => {
     console.log('Response data:', data);
+    addChatMessage(data.response, 'bot'); // Display the bot response
   })
   .catch(error => {
     console.error('Fetch error:', error);
   });
 
 }
-
 
 function initializePopup() {
   // Get the current tab's URL and update the link
@@ -143,4 +144,14 @@ function saveChatMessage(message) {
       console.log('Message saved:', message);
     });
   });
+}
+
+// Function to add chat message to chat zone
+function addChatMessage(message, sender) {
+  let chatZone = document.getElementById('chat-zone');
+  let messageElement = document.createElement('div');
+  messageElement.className = `chat-message ${sender}`;
+  messageElement.textContent = message;
+  chatZone.appendChild(messageElement);
+  chatZone.scrollTop = chatZone.scrollHeight; // Scroll to the bottom
 }

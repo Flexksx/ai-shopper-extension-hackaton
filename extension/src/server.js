@@ -253,7 +253,7 @@ app.get('/thread/:id/messages', async (req, res) => {
     try {
         let messagesList=[]
         const messages = await bot.listMessagesInThread(req.params.id);
-        console.log(messages.body.data[0].content[0]);
+        // console.log(messages.body.data[0].content[0]);
         for (let i = 0; i < messages.body.data.length; i++) {
             let messageRole = messages.body.data[i].role;
             let messageContent =""
