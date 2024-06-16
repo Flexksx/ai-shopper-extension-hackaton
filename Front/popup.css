@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  padding: 20px;
+  padding: 0;
   width: 400px;
   height: 600px;
   border-radius: 10px;
@@ -9,7 +9,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow-y: auto;
+  overflow: hidden; /* Prevent body from being scrollable */
   position: relative;
   margin: 0; /* Remove default margin */
 }
@@ -66,10 +66,24 @@ body::-webkit-scrollbar-thumb:hover {
 
 h1 {
   font-size: 24px;
+  text-align: center;
+  margin: 10px 0;
 }
 
-.link {
-  margin: 15px 0;
+/* Small link styles */
+.small-link {
+  text-align: center;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.small-link a {
+  color: #333;
+  text-decoration: none;
+}
+
+.small-link a:hover {
+  text-decoration: underline;
 }
 
 /* Chat zone styles */
@@ -79,8 +93,10 @@ h1 {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  margin-bottom: 10px;
+  margin: 10px; /* Gap between chat zone and extension borders */
   background-color: #fff;
+  box-sizing: border-box;
+  max-height: calc(100% - 160px); /* Adjust height based on navbar and header */
 }
 
 /* Chat message styles */
@@ -88,6 +104,7 @@ h1 {
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
+  word-wrap: break-word; /* Ensure long words wrap correctly */
 }
 
 .chat-message.user {
@@ -109,10 +126,9 @@ h1 {
   background-color: #f8f8f8;
   border-top: 1px solid #ccc;
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%; /* Full width */
+  bottom: 10px; /* Gap between chat bar and extension border */
+  left: 10px; /* Gap between chat bar and extension border */
+  right: 10px; /* Gap between chat bar and extension border */
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 0 0 10px 10px;
   box-sizing: border-box;

@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('send-btn').addEventListener('click', function () {
     let chatInput = document.getElementById('chat-input').value.trim();
     if (chatInput) {
-      addChatMessage(chatInput, 'user'); // Display the user message
       saveChatMessage(chatInput); // Save the chat message
       console.log('Chat message:', chatInput);
       document.getElementById('chat-input').value = ''; // Clear the input field
@@ -72,7 +71,6 @@ function sendMessageToServer(message) {
   })
   .then(data => {
     console.log('Response data:', data);
-    addChatMessage(data.response, 'bot'); // Display the bot response
   })
   .catch(error => {
     console.error('Fetch error:', error);
@@ -110,11 +108,11 @@ function initializePopup() {
 
 function sendTabUrlToServer(currentTabUrl) {
   let serverIp = "http://localhost:3000";
-  let endpoint = "/thread";
+  let endpoint = "/source";
   let thread_id = "thread_T4e3FqCxs0KCfcadzYGUZHjb";
-  let requestBody = { "url": currentTabUrl };
+  let requestBody = { "source_url": currentTabUrl };
 
-  fetch(`${serverIp}${endpoint}/${thread_id}/addwebsite`, {
+  fetch(`${serverIp}${endpoint}/${thread_id}`, {
     method: "POST",
     body: JSON.stringify(requestBody),
     headers: {
@@ -133,25 +131,21 @@ function sendTabUrlToServer(currentTabUrl) {
   .catch(error => {
     console.error('Fetch error:', error);
   });
+
 }
 
-// Function to save chat message
 function saveChatMessage(message) {
-  chrome.storage.local.get({ messages: [] }, function (data) {
-    let messages = data.messages;
-    messages.push(message);
-    chrome.storage.local.set({ messages: messages }, function () {
-      console.log('Message saved:', message);
-    });
-  });
-}
-
-// Function to add chat message to chat zone
-function addChatMessage(message, sender) {
   let chatZone = document.getElementById('chat-zone');
-  let messageElement = document.createElement('div');
-  messageElement.className = `chat-message ${sender}`;
-  messageElement.textContent = message;
-  chatZone.appendChild(messageElement);
+
+  if (!chatZone) {
+    console.error('Chat zone element is missing');
+    return;
+  }
+
+  let chatMessage = document.createElement('div');
+  chatMessage.className = 'chat-message user';
+  chatMessage.textContent = message;
+
+  chatZone.appendChild(chatMessage);
   chatZone.scrollTop = chatZone.scrollHeight; // Scroll to the bottom
 }
